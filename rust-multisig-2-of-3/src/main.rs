@@ -11,6 +11,6 @@ fn main() {
     // let _ = generate_wallets();
     // let keys = get_keys();
     let descriptor =  generate();
-     println!("{:#?}", descriptor);
+    println!("{:#?}", descriptor);
    
 }

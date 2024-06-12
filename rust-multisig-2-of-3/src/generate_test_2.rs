@@ -1,11 +1,5 @@
 use bdk::{
-    blockchain::ElectrumBlockchain,
-    bitcoin::{Network, Address},
-    database::MemoryDatabase,
-    electrum_client::Client,
-    wallet::{Wallet, AddressIndex}, 
-    SyncOptions,   
-    SignOptions,
+    bitcoin::{opcodes, script, Address, Network}, blockchain::ElectrumBlockchain, database::MemoryDatabase, electrum_client::Client, wallet::{AddressIndex, Wallet}, SignOptions, SyncOptions
 };
 use bdk::bitcoin::{Script};
 
@@ -29,7 +23,7 @@ pub fn create_wallet() -> Result<(), Box<dyn std::error::Error>> {
     wallet.sync(&blockchain, SyncOptions::default())?;
 
     let address = wallet.get_address(AddressIndex::New)?;
-    let script_pubkey = address.script_pubkey();
+    let script_pubkey = address.payload.script_pubkey();
    
     println!("Public key: {}", script_pubkey);
     
@@ -46,6 +40,15 @@ pub fn create_wallet() -> Result<(), Box<dyn std::error::Error>> {
     // let (mut psbt, tx_details) = tx_builder.finish()?;
     // println!("Transaction details: {:#?}", tx_details);
     println!("Generated Address: {}", address);
+
+    let multisig_script = Script::builder()
+        .push_int(2)
+        .push_slice(&pubkey1.key.serialize())
+        .push_slice(&pubkey2.key.serialize())
+        .push_slice(&pubkey3.key.serialize())
+        .push_int(3)
+        .push_opcode(opcodes::all::OP_CHECKMULTISIG)
+        .into_script();
 
 
     Ok(())
