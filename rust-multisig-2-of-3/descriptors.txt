@@ -1,2 +1,0 @@
-Receive Descriptor: wpkh([6b6a1483/84'/1'/0'/0]tprv8ho4rFsEmybLemAJKeYAaRKA36qxwQZVggaaA4L2S1bzVXkjHfxmhqTt5UUTd3QFDjSBefBpqXcNcbrrzw2FtEjNWsezoFGhE4ypnoSEw2K/*)
-Change Descriptor: wpkh([6b6a1483/84'/1'/0'/1]tprv8ho4rFsEmybLiPwhBu2ZjzcCDVPcQPVvG2p94bFXtfkk7GuYJ5yXMRjdyXVC37jgi4w6sYN3BV69FRYSed78obV6TMMNjhVPJvXXmye9nHL/*)

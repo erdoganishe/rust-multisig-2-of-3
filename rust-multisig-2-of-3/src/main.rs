@@ -1,6 +1,6 @@
-mod generate_pubkeys;
-use generate_pubkeys::write_descriptors;
+use generate_wallet::generate_wallets;
+mod generate_wallet;
 
 fn main() {
-    write_descriptors("descriptors.txt");
+    generate_wallets();
 }
