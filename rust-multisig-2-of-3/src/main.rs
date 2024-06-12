@@ -1,3 +1,6 @@
+mod generate_pubkeys;
+use generate_pubkeys::write_descriptors;
+
 fn main() {
-    println!("Hello, world!");
+    write_descriptors("descriptors.txt");
 }
