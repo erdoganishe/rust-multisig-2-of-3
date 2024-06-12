@@ -5,5 +5,6 @@ mod script_generation;
 
 fn main() {
     let _ = generate_wallets();
-    get_keys();
+    let keys = get_keys();
+    println!("{:#?}", keys);
 }
