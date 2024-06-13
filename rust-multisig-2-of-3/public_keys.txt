@@ -1,3 +1,98 @@
 wpkh(XPub(DescriptorXKey { origin: Some((e273fe42, m/84'/0'/0')), xkey: ExtendedPubKey { network: Testnet, depth: 3, parent_fingerprint: 14fe59bf, child_number: Hardened { index: 0 }, public_key: PublicKey(b9264dc5330c35affd126f2ba4a2e756c44d26fa7fe5480fdd5e8965de9010340fe7946a9d9a70d663e70f6e4433bf811d9079f3503848c97800e8fb8dc79deb), chain_code: 216720015b46ba4d5f8de774f47f788fdead94def6985d9e08f9e83dfe1b1312 }, derivation_path: m/0, wildcard: Unhardened }))
 wpkh(XPub(DescriptorXKey { origin: Some((e273fe42, m/84'/0'/1')), xkey: ExtendedPubKey { network: Testnet, depth: 3, parent_fingerprint: 14fe59bf, child_number: Hardened { index: 1 }, public_key: PublicKey(5052411b903e6b54c8ce328309f469d32423dd4d95782b8d7f8bee44e6d3e94d22059bdcc2908b6451d5bfa98beef961aac1c1430d471a7f21e6fb1d7f627e30), chain_code: a72eef3acd871095a32d0979df21677b82139208056d51c840f6760ff16d8d0e }, derivation_path: m/0, wildcard: Unhardened }))
 wpkh(XPub(DescriptorXKey { origin: Some((e273fe42, m/84'/0'/2')), xkey: ExtendedPubKey { network: Testnet, depth: 3, parent_fingerprint: 14fe59bf, child_number: Hardened { index: 2 }, public_key: PublicKey(8ddf9aa1eac1c789fc8e4c5d0d1aa869ef2f3f5a638ec53d4488791d2d3b3e9035e414e9dd31b1e30b7d6600fcdd5d1659821a1b66ea9686fea954dbeaffcd2a), chain_code: fd1a8522cf1c3dd1dc379aa924861f18e269aa0a5cbd01b6adc46966873f13cd }, derivation_path: m/0, wildcard: Unhardened }))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ sh([B/nduesm]multi(2,Single(SinglePub { origin: None, key: FullKey(PublicKey { compressed: true, inner: PublicKey(3d253b60ebeadb06dbf626d7ef6ef0d1098dadbae13e9b7d5d0f9614ecdc07962d4a4feb0982987ff9449598b9c565f6072437e07124900a4a90331e4f8452e8) }) }),Single(SinglePub { origin: None, key: FullKey(PublicKey 
+{ compressed: true, inner: PublicKey(c4f917c18ebddb17d7a21d27fbb84fe8396e5f4fd84be1d9059fcfa0644ea09f14d14d7599d0a991be3b6554f309ec0a1174eea2961d692319db48a4fbfff855) }) }),Single(SinglePub { origin: None, key: FullKey(PublicKey { compressed: true, inner: PublicKey(4cfff6094c62c837de75ea9edbab52d77d69b7890c140563560d8012a388596cdad4a829bff9826b8b9eda1dca4f14b2e70a0896e0def384d3a0811b2fd5001d) }) }))),
+    {
+        Single(
+            SinglePub {
+                origin: None,
+                key: FullKey(
+                    PublicKey {
+                        compressed: true,
+                        inner: PublicKey(
+                            3d253b60ebeadb06dbf626d7ef6ef0d1098dadbae13e9b7d5d0f9614ecdc07962d4a4feb0982987ff9449598b9c565f6072437e07124900a4a90331e4f8452e8,
+                        ),
+                    },
+                ),
+            },
+        ): Single(
+            SinglePriv {
+                origin: None,
+                key: PrivateKey {
+                    compressed: true,
+                    network: Bitcoin,
+                    inner: SecretKey(
+                        #637c84e00aae2bb1,
+                    ),
+                },
+            },
+        ),
+        Single(
+            SinglePub {
+                origin: None,
+                key: FullKey(
+                    PublicKey {
+                        compressed: true,
+                        inner: PublicKey(
+                            c4f917c18ebddb17d7a21d27fbb84fe8396e5f4fd84be1d9059fcfa0644ea09f14d14d7599d0a991be3b6554f309ec0a1174eea2961d692319db48a4fbfff855,
+                        ),
+                    },
+                ),
+            },
+        ): Single(
+            SinglePriv {
+                origin: None,
+                key: PrivateKey {
+                    compressed: true,
+                    network: Bitcoin,
+                    inner: SecretKey(
+                        #8d1930209d838f20,
+                    ),
+                },
+            },
+        ),
+        Single(
+            SinglePub {
+                origin: None,
+                key: FullKey(
+                    PublicKey {
+                        compressed: true,
+                        inner: PublicKey(
+                            4cfff6094c62c837de75ea9edbab52d77d69b7890c140563560d8012a388596cdad4a829bff9826b8b9eda1dca4f14b2e70a0896e0def384d3a0811b2fd5001d,
+                        ),
+                    },
+                ),
+            },
+        ): Single(
+            SinglePriv {
+                origin: None,
+                key: PrivateKey {
+                    compressed: true,
+                    network: Bitcoin,
+                    inner: SecretKey(
+                        #1027e01cbc6784bd,
+                    ),
+                },
+            },
+        ),
+    },
+    {
+        Bitcoin,
+    },
+)
