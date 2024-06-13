@@ -1,12 +1,16 @@
+use bdk::bitcoin::bip32::ExtendedPrivKey;
 use bdk::bitcoin::key::Secp256k1;
-use bdk::bitcoin::Network;
+use bdk::bitcoin::{Network, PrivateKey};
 use bdk::descriptor::IntoWalletDescriptor;
-use bdk::signer::SignersContainer;
+use bdk::signer::{SignerContext, SignerOrdering, SignerWrapper, SignersContainer, TransactionSigner};
 use bdk::wallet::AddressIndex;
 use bdk::wallet::{get_funded_wallet, Wallet};
-use bdk::{descriptor, SignOptions};
+use bdk::{descriptor, KeychainKind, SignOptions};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::str::FromStr;
+use std::sync::Arc;
+
 
 //get private keys from file
 pub fn get_private_keys(path: &str) -> Vec<String> {
@@ -26,7 +30,9 @@ pub fn get_private_keys(path: &str) -> Vec<String> {
 }
 
 pub fn create_wallet() {
-    let (wallet, _, _) = get_funded_wallet("sh(wsh(multi(1,cVpPVruEDdmutPzisEsYvtST1usBR3ntr8pXSyt6D2YYqXRyPcFW,cRjo6jqfVNP33HhSS76UhXETZsGTZYx8FMFvR9kpbtCSV1PmdZdu)))");
+    let (mut wallet, _, _) = get_funded_wallet("wsh(multi(2,039607dcec14960f5d7d9b3ee1baad8d09d1f06eefd726f6db06dbeaeb603b253d,029fa04e64a0cf9f05d9e14bd84f5f6e39e84fb8fb271da2d717dbbd8ec117f9c4,026c5988a312800d566305140c89b7697dd752abdb9eea75de37c8624c09f6ff4c))#qj7053gj");
+    
+    
     let addr = wallet.get_address(AddressIndex::New).unwrap();
     let balance = wallet.get_balance().unwrap();
     let mut builder = wallet.build_tx();
@@ -38,41 +44,62 @@ pub fn create_wallet() {
 
     let secp = Secp256k1::new();
     let private_keys = get_private_keys("keypairs.txt");
+    println!("{:#?}", private_keys);
+    
+    for private_key in private_keys {
+        let xpriv = PrivateKey::from_wif(&private_key).unwrap();
+        println!("{}", xpriv);
+        let signer: SignerWrapper<PrivateKey> = SignerWrapper::new(
+            xpriv,
+            SignerContext::Segwitv0
+        );
 
-    let desc = descriptor!(sh(multi(
-        2,
-        private_keys[0].clone(),
-        private_keys[1].clone(),
-        private_keys[2].clone()
-    )))
-    .unwrap();
-
-    // println!("{:#?}", desc);
-
-    let (wallet_desc, keymap) = desc
-        .into_wallet_descriptor(&secp, Network::Bitcoin)
-        .unwrap();
-
-    let signers_container = SignersContainer::build(keymap, &wallet_desc, &secp);
-    println!("{:#?}", signers_container);
-    let signers = signers_container.signers();
-    let mut signatures = vec![];
-    let sign_option = SignOptions::default();
-    for signer in signers {
-        let private_key = signer.clone();
-        let signature = private_key.sign_transaction(&mut psbt, &sign_option, &secp);
-        signatures.push(signature.unwrap());
+        wallet.add_signer(
+            KeychainKind::External,
+            SignerOrdering::default(),
+            Arc::new(signer) as Arc<dyn TransactionSigner>);
     }
 
-    println!("{:#?}", signatures);
+    
+    // let signer: std::sync::Arc<dyn TransactionSigner>;
+    // wallet.add_signer(KeychainKind::External, bdk::signer::SignerOrdering::default(), signer);
+    
+    // let desc = descriptor!(sh(multi(
+    //     2,
+    //     private_keys[0].clone(),
+    //     private_keys[1].clone(),
+    //     private_keys[2].clone()
+    // )))
+    // .unwrap();
 
-    let signed_psbt = wallet.sign(&mut psbt, sign_option).unwrap();
+    // // println!("{:#?}", desc);
 
-    println!("Signed PSBT: {}", signed_psbt);
-    println!("Psbt: {}", psbt);
+    // let (wallet_desc, keymap) = desc
+    //     .into_wallet_descriptor(&secp, Network::Bitcoin)
+    //     .unwrap();
 
-    // println!("Addr: {}", addr);
-    // println!("Balance: {}", balance);
+    // let signers_container = SignersContainer::build(keymap, &wallet_desc, &secp);
+    // println!("{:#?}", signers_container);
+    // let signers = signers_container.signers();
+    // let mut signatures = vec![];
+    // let sign_option = SignOptions::default();
+    // for signer in signers {
+    //     let private_key = signer.clone();
+    //     let signature = private_key.sign_transaction(&mut psbt, &sign_option, &secp);
+    //     signatures.push(signature.unwrap());
+    // }
+
+    // println!("{:#?}", signatures);
+
+    // let signed_psbt = wallet.sign(&mut psbt, sign_option).unwrap();
+
+    // println!("Signed PSBT: {}", signed_psbt);
+    // println!("Psbt: {}", psbt);
+
+    println!("Addr: {}", addr);
+    println!("Balance: {}", balance);
+
+    
 }
 
 // #[test]
