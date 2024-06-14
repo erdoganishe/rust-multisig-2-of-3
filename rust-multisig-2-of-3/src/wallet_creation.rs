@@ -94,7 +94,7 @@ pub fn create_wallet() {
     // let signed_psbt = wallet.sign(&mut psbt, sign_option).unwrap();
 
     // println!("Signed PSBT: {}", signed_psbt);
-    // println!("Psbt: {}", psbt);
+    println!("Psbt: {}", psbt);
 
     println!("Addr: {}", addr);
     println!("Balance: {}", balance);
