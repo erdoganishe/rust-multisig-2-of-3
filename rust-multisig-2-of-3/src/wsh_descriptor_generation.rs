@@ -34,7 +34,7 @@ pub fn generate_descriptor() -> Descriptor<PublicKey> {
 
     let mut file = File::create("descriptors.txt").expect("Error with file creation");
 
-    writeln!(file, "Descriptor: {}", descriptor).expect("Error writing in file");
+    writeln!(file, "{}", descriptor).expect("Error writing in file");
 
     descriptor
 }

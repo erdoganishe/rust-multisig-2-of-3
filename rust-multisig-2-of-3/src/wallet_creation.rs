@@ -2,9 +2,12 @@ use bdk::bitcoin::bip32::ExtendedPrivKey;
 use bdk::bitcoin::key::Secp256k1;
 use bdk::bitcoin::consensus::encode::serialize;
 use bdk::bitcoin::{base64, Network, PrivateKey};
+use bdk::blockchain::{Blockchain, ElectrumBlockchain};
+use bdk::database::MemoryDatabase;
 use bdk::descriptor::IntoWalletDescriptor;
+use bdk::electrum_client::Client;
 use bdk::signer::{SignerContext, SignerOrdering, SignerWrapper, SignersContainer, TransactionSigner};
-use bdk::wallet::AddressIndex;
+use bdk::wallet::{self, AddressIndex};
 use bdk::wallet::{get_funded_wallet, Wallet};
 use bdk::{descriptor, KeychainKind, SignOptions};
 use std::fs::File;
@@ -29,28 +32,55 @@ pub fn get_private_keys(path: &str) -> Vec<String> {
 
     private_keys
 }
+pub fn get_descriptor(path: &str) -> String{
+    let file = File::open(path).expect("Error with opening file");
+    let reader = BufReader::new(file);
 
+    let mut descriptor:String = "".to_string();
+
+    for line in reader.lines() {
+        let line = line.unwrap();
+        descriptor = line;
+    }
+
+    descriptor
+}
 pub fn create_wallet() {
-    let descriptor = "wsh(multi(2,039607dcec14960f5d7d9b3ee1baad8d09d1f06eefd726f6db06dbeaeb603b253d,029fa04e64a0cf9f05d9e14bd84f5f6e39e84fb8fb271da2d717dbbd8ec117f9c4,026c5988a312800d566305140c89b7697dd752abdb9eea75de37c8624c09f6ff4c))#qj7053gj";
-    let (mut wallet, _, _) = get_funded_wallet(descriptor);
+    let descriptor = &get_descriptor("descriptors.txt");
+    // let (mut wallet, _, _) = get_funded_wallet(descriptor);
+
+    let mut wallet = Wallet::new(descriptor, None, 
+        Network::Testnet,
+        MemoryDatabase::new()).unwrap();
+ 
+    println!("Network: {}", wallet.network());
 
     let addr = wallet.get_address(AddressIndex::New).unwrap();
     let balance = wallet.get_balance().unwrap();
     println!("Addr: {}", addr);
     println!("Balance: {}", balance);
+    let client = Client::new("ssl://electrum.blockstream.info:60002").expect("failed to connect");
+    let blockchain = ElectrumBlockchain::from(client);
+    wallet.sync(&blockchain, Default::default()).unwrap();
 
-    // Ensure that you have UTXOs
-    // let utxos = wallet.list_unspent().unwrap();
+    // Get all UTXOs
+    let utxos = wallet.list_unspent().unwrap();
+
+    // Print the UTXOs
+    for utxo in utxos {
+        println!("{:?}", utxo);
+    }
 
     let mut builder = wallet.build_tx();
     builder
         .drain_to(addr.script_pubkey())
+        .fee_rate(bdk::FeeRate::from_sat_per_vb(35.0))
         .only_witness_utxo()
         .drain_wallet();
     let (mut psbt, _) = builder.finish().unwrap();
 
     let private_keys = get_private_keys("keypairs.txt");
-    
+    println!("{:#?}", private_keys);
     for private_key in private_keys {
         let xpriv = PrivateKey::from_wif(&private_key).unwrap();
         let signer: SignerWrapper<PrivateKey> = SignerWrapper::new(
@@ -61,7 +91,7 @@ pub fn create_wallet() {
         wallet.add_signer(
             KeychainKind::External,
             SignerOrdering::default(),
-            Arc::new(signer) as Arc<dyn TransactionSigner>
+            Arc::new(signer) 
         );
     }
 
@@ -71,9 +101,14 @@ pub fn create_wallet() {
         ..Default::default()    
     };
     println!("{:#?}", sign_options.trust_witness_utxo);
+    println!("Non-signed PSBT: {}", psbt);
     wallet.sign(&mut psbt, sign_options).unwrap();
 
     // Print the final PSBT
     println!("Final PSBT: {}", psbt);
-
+ 
+    let final_tx = psbt.extract_tx();
+    println!("{:#?}", final_tx);
+    let txid = blockchain.broadcast(&final_tx).unwrap();
+    println!("Transaction broadcasted with txid: {:#?}", txid);
 }
